@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script type="text/javascript" src="js/digit.js" ></script>
+	</head>
+	<body>
+		<canvas id="canvas" style="display:block;margin: auto;"></canvas>
+	</body>
+	<script>
+	var WINDOW_WIDTH=1024;    //画布宽度
+	var WINDOW_HEIGHT=568;     //画布高度
+	var RADIUS=8;    //半径
+	var MARGIN_LEFT=30;      //距离画布上边距离
+	var MARGIN_TOP=60;       //第一个数值画布左边距离
+	const endTime=new Date(2015,0,20,23,20,45);  //获取截止日期
+	var curShowTimeSeconds=0;       //获取倒计时还剩余多长时间
+	var balls=[];       //下落小球的状态
+	var colors=["#33B5E5","#14F0E1","#E12D9B","#caff67","#67becf","#ef3d61","#f9f51a","#a594c0","#fa8ecc","f6ca29"]; //颜色
+		window.onload=function(){
+			var canvas=document.getElementById("canvas");
+			canvas.width=WINDOW_WIDTH;
+			canvas.height=WINDOW_HEIGHT;
+			var context=canvas.getContext('2d');
+			curShowTimeSeconds=getCurrentShowTimeSeconds();
+			setInterval(function(){
+				reder(context);	
+				update();
+			},50);  //50毫秒执行一次function（）匿名函数的操作
+			
+			
+		}
+		
+		function update(){   //判断在50毫秒内时间有无变化,变化则下一个50毫米更新界面reder是改变curShowTimeSeconds剩余时间
+			var nextShowTimeSeconds=getCurrentShowTimeSeconds();
+			var nextHours=parseInt(nextShowTimeSeconds/3600);
+			var nextMinutes=parseInt((nextShowTimeSeconds-nextHours*3600)/60);
+			var nextSeconds=parseInt((nextShowTimeSeconds%60));
+			
+			var curHours=parseInt(curShowTimeSeconds/3600);
+			var curMinutes=parseInt((curShowTimeSeconds-curHours*3600)/60);
+			var curSeconds=parseInt((curShowTimeSeconds%60));
+			
+			if(nextSeconds!=curSeconds){
+				//判断哪个数值发生变化记录下来
+				if((parseInt(nextHours/10))!= parseInt(curHours/10)){
+					addballs(MARGIN_LEFT,MARGIN_TOP,parseInt(curHours/10));
+				}
+				if(parseInt(nextHours%10)!= parseInt(curHours%10)){
+					addballs(MARGIN_LEFT+15*(RADIUS+1),MARGIN_TOP,parseInt(curHours%10));
+				}
+				
+				if((parseInt(nextMinutes/10))!= parseInt(curMinutes/10)){
+					addballs(MARGIN_LEFT+39*(RADIUS+1),MARGIN_TOP,parseInt(curMinutes/10));
+				}
+				if(parseInt(nextMinutes%10)!= parseInt(curMinutes%10)){
+					addballs(MARGIN_LEFT+54*(RADIUS+1),MARGIN_TOP,parseInt(curMinutes%10));
+				}
+				
+				if((parseInt(nextSeconds/10))!= parseInt(curSeconds/10)){
+					addballs(MARGIN_LEFT+78*(RADIUS+1),MARGIN_TOP,parseInt(curSeconds/10));
+				}
+				if(parseInt(nextSeconds%10)!= parseInt(curSeconds%10)){
+					addballs(MARGIN_LEFT+93*(RADIUS+1),MARGIN_TOP,parseInt(curSeconds%10));
+				}
+				curShowTimeSeconds=nextShowTimeSeconds;	
+			}
+			
+			
+			//进行小球的物理活动
+		     updateballs();
+				
+				
+			
+			
+		}
+		function updateballs(){
+				for(var i=0;i<balls.length;i++){
+				var ball=balls[i];
+				ball.x+=ball.vx;
+				ball.y+=ball.vy;
+				ball.vy+=ball.g;
+				if(ball.y>=WINDOW_HEIGHT-RADIUS){
+					ball.y=WINDOW_HEIGHT-RADIUS;
+					ball.vy=-ball.vy*0.75;	
+				}
+		    }
+				console.log(balls.length);
+				
+				
+				//优化内存
+				var net=0;
+				for(var i=0;i<balls.length;i++){
+					var ball=balls[i];
+				    if(ball.x>=RADIUS&&ball.x<WINDOW_WIDTH-RADIUS)
+				        balls[net++]=balls[i];
+				}
+				//清除不在屏幕中的小球
+				while(net<balls.length)
+				   balls.pop();
+	}
+		
+		
+		function getCurrentShowTimeSeconds(){
+			var curTime=new Date();
+			var ret=endTime.getTime()-curTime.getTime();     //获得毫秒数的差值即剩余毫秒数
+			ret=Math.round(ret/1000);        //计算剩余秒数的整数值
+			return ret>=0 ? ret:0;
+		}
+		function reder(cxt){
+			cxt.clearRect(0,0,WINDOW_WIDTH,WINDOW_HEIGHT);   //对画布里的部分（目前是全部）刷新一遍
+			var hours=parseInt(curShowTimeSeconds/3600);
+			var minutes=parseInt((curShowTimeSeconds-hours*3600)/60);
+			var seconds=parseInt((curShowTimeSeconds%60));
+			
+			renderDigit(MARGIN_LEFT,MARGIN_TOP,parseInt(hours/10),cxt);
+			renderDigit(MARGIN_LEFT+15*(RADIUS+1),MARGIN_TOP,parseInt(hours%10),cxt);
+			renderDigit(MARGIN_LEFT+30*(RADIUS+1),MARGIN_TOP,10,cxt);
+			renderDigit(MARGIN_LEFT+39*(RADIUS+1),MARGIN_TOP,parseInt(minutes/10),cxt);
+			renderDigit(MARGIN_LEFT+54*(RADIUS+1),MARGIN_TOP,parseInt(minutes%10),cxt);
+			renderDigit(MARGIN_LEFT+69*(RADIUS+1),MARGIN_TOP,10,cxt);
+			renderDigit(MARGIN_LEFT+78*(RADIUS+1),MARGIN_TOP,parseInt(seconds/10),cxt);
+			renderDigit(MARGIN_LEFT+93*(RADIUS+1),MARGIN_TOP,parseInt(seconds%10),cxt);
+			
+			
+			//绘制所有掉落的小球
+			for(var i=0;i<balls.length;i++){
+				var ball=balls[i];
+				cxt.beginPath();
+				cxt.arc(ball.x,ball.y,RADIUS,0,2*Math.PI);
+				cxt.closePath();
+				cxt.fillStyle=ball.color;
+				cxt.fill();
+			}
+		}
+		
+		function addballs(x,y,num){
+			for (var i=0;i<digit[num].length;i++) {
+            	for(var j=0;j<digit[num][i].length;j++){
+            		if(digit[num][i][j]==1){
+            			var ball={
+            				x:x+2*j*(RADIUS+1),
+            				y:y+2*i*(RADIUS+1)+(RADIUS+1),
+            				g:1.5+Math.random(),
+            				vx:Math.pow(-1,Math.ceil(Math.random()*1000))*4,
+            				vy:-5,
+            				color:colors[Math.floor(Math.random()*colors.length)]
+            			}
+            			balls.push(ball);  //增加的小球放入balls数组中
+            		}	
+            	}
+            }	
+		}
+		
+		function renderDigit(x,y,num,cxt){
+			cxt.fillStyle="rgb(0,102,153)";
+            for (var i=0;i<digit[num].length;i++) {
+            	for(var j=0;j<digit[num][i].length;j++){
+            		if(digit[num][i][j]==1){
+            			cxt.beginPath();
+            			cxt.arc(x+2*j*(RADIUS+1)+(RADIUS+1),y+2*i*(RADIUS+1)+(RADIUS+1),RADIUS,0,2*Math.PI);
+            			cxt.closePath();
+            			cxt.fill();
+            		}	
+            	}
+            }	
+		}	
+	</script>
+</html>
