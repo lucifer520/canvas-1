@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script type="text/javascript" src="../js/digit.js" ></script>
+	</head>
+	<body>
+		<canvas id="canvas" style="display:block;margin: auto;"></canvas>
+	</body>
+	<script>
+	var WINDOW_WIDTH=1024;    //画布宽度
+	var WINDOW_HEIGHT=768;     //画布高度
+	var RADIUS=8;    //半径
+	var MARGIN_LEFT=30;      //距离画布上边距离
+	var MARGIN_TOP=60;       //第一个数值画布左边距离
+		window.onload=function(){
+			var canvas=document.getElementById("canvas");
+			canvas.width=WINDOW_WIDTH;
+			canvas.height=WINDOW_HEIGHT;
+			var context=canvas.getContext('2d');
+			reder(context);			
+		}
+		
+		function reder(cxt){
+			var hours=12;
+			var minutes=34;
+			var seconds=56;
+			
+			renderDigit(MARGIN_LEFT,MARGIN_TOP,parseInt(hours/10),cxt);
+			renderDigit(MARGIN_LEFT+15*(RADIUS+1),MARGIN_TOP,parseInt(hours%10),cxt);
+			renderDigit(MARGIN_LEFT+30*(RADIUS+1),MARGIN_TOP,10,cxt);
+			renderDigit(MARGIN_LEFT+39*(RADIUS+1),MARGIN_TOP,parseInt(minutes/10),cxt);
+			renderDigit(MARGIN_LEFT+54*(RADIUS+1),MARGIN_TOP,parseInt(minutes%10),cxt);
+			renderDigit(MARGIN_LEFT+69*(RADIUS+1),MARGIN_TOP,10,cxt);
+			renderDigit(MARGIN_LEFT+78*(RADIUS+1),MARGIN_TOP,parseInt(seconds/10),cxt);
+			renderDigit(MARGIN_LEFT+93*(RADIUS+1),MARGIN_TOP,parseInt(seconds%10),cxt);
+		}
+		
+		function renderDigit(x,y,num,cxt){
+			cxt.fillStyle="rgb(0,102,153)";
+            for (var i=0;i<digit[num].length;i++) {
+            	for(var j=0;j<digit[num][i].length;j++){
+            		if(digit[num][i][j]==1){
+            			cxt.beginPath();
+            			cxt.arc(x+2*j*(RADIUS+1)+(RADIUS+1),y+2*i*(RADIUS+1)+(RADIUS+1),RADIUS,0,2*Math.PI);
+            			cxt.closePath();
+            			cxt.fill();
+            		}	
+            	}
+            }	
+		}	
+	</script>
+</html>
