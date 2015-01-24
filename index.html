@@ -14,7 +14,8 @@
 	var RADIUS=8;    //半径
 	var MARGIN_LEFT=30;      //距离画布上边距离
 	var MARGIN_TOP=60;       //第一个数值画布左边距离
-	const endTime=new Date(2015,0,20,23,20,45);  //获取截止日期
+	const endTime=new Date();  //获取截止日期
+	endTime.setHours(endTime.getHours()+1);
 	var curShowTimeSeconds=0;       //获取倒计时还剩余多长时间
 	var balls=[];       //下落小球的状态
 	var colors=["#33B5E5","#14F0E1","#E12D9B","#caff67","#67becf","#ef3d61","#f9f51a","#a594c0","#fa8ecc","f6ca29"]; //颜色
@@ -23,6 +24,7 @@
 			canvas.width=WINDOW_WIDTH;
 			canvas.height=WINDOW_HEIGHT;
 			var context=canvas.getContext('2d');
+			
 			curShowTimeSeconds=getCurrentShowTimeSeconds();
 			setInterval(function(){
 				reder(context);	
